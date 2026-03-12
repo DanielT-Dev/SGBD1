@@ -33,4 +33,8 @@ public class ItemController {
     public void deleteItemForUser(int itemId) {
         itemService.deleteItem(itemId);
     }
+
+    public void updateItem(int id, String title, String description, BigDecimal price) {
+        itemService.updateItem(id, title, description, price);
+    }
 }

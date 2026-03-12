@@ -21,4 +21,7 @@ public class ItemService {
     public void deleteItem(int itemId) {
         itemRepository.deleteItem(itemId);
     }
+    public void updateItem(int id, String title, String description, BigDecimal price) {
+        itemRepository.updateItem(id, title, description, price);
+    }
 }

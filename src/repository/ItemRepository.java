@@ -64,4 +64,23 @@ public class ItemRepository {
             e.printStackTrace();
         }
     }
+
+    public void updateItem(int id, String title, String description, BigDecimal price) {
+
+        String sql = "UPDATE items SET title = ?, description = ?, price = ? WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, title);
+            ps.setString(2, description);
+            ps.setBigDecimal(3, price);
+            ps.setInt(4, id);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

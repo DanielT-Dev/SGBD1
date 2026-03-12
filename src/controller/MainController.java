@@ -24,6 +24,7 @@ public class MainController {
     private Button showItemsBtn = new Button("Show Items for Selected User");
     private Button addItemBtn = new Button("Add Item for Selected User");
     private Button deleteItemBtn = new Button("Delete Selected Item");
+    private Button updateItemBtn = new Button("Update Selected Item");
     private Label userItemsLabel = new Label("Select a user to display posted items");
 
     // Items & Transactions tabs
@@ -54,8 +55,12 @@ public class MainController {
         deleteItemBtn.setOnAction(e -> deleteSelectedItem());
         deleteItemBtn.setVisible(false);
 
+        updateItemBtn.setOnAction(e -> updateSelectedItem());
+        updateItemBtn.setDisable(true);
+
         userItemsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             deleteItemBtn.setVisible(newSel != null);
+            updateItemBtn.setDisable(newSel == null);
         });
 
         userItemsLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
@@ -79,7 +84,7 @@ public class MainController {
 
         // Horizontal box for Add and Delete buttons
         HBox buttonBox = new HBox(10); // 10px spacing between buttons
-        buttonBox.getChildren().addAll(addItemBtn, deleteItemBtn);
+        buttonBox.getChildren().addAll(addItemBtn, deleteItemBtn, updateItemBtn);
 
         // Users tab VBox
         VBox usersTabContent = new VBox(10,
@@ -117,7 +122,7 @@ public class MainController {
         showItemsBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8 20 8 20;");
         addItemBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8 20 8 20;");
         deleteItemBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8 20 8 20;");
-
+        updateItemBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8 20 8 20;");
         stage.show();
     }
 
@@ -217,6 +222,41 @@ public class MainController {
                 }
             });
         }
+    }
+
+    private void updateSelectedItem() {
+
+        Item selectedItem = userItemsTable.getSelectionModel().getSelectedItem();
+        if (selectedItem == null) return;
+
+        TextInputDialog titleDialog = new TextInputDialog(selectedItem.getTitle());
+        titleDialog.setHeaderText("Update item title:");
+        String title = titleDialog.showAndWait().orElse(selectedItem.getTitle());
+
+        TextInputDialog descDialog = new TextInputDialog(selectedItem.getDescription());
+        descDialog.setHeaderText("Update item description:");
+        String desc = descDialog.showAndWait().orElse(selectedItem.getDescription());
+
+        TextInputDialog priceDialog = new TextInputDialog(selectedItem.getPrice().toString());
+        priceDialog.setHeaderText("Update item price:");
+        String priceStr = priceDialog.showAndWait().orElse(selectedItem.getPrice().toString());
+
+        BigDecimal price;
+        try {
+            price = new BigDecimal(priceStr);
+        } catch (NumberFormatException e) {
+            new Alert(Alert.AlertType.ERROR, "Invalid price").showAndWait();
+            return;
+        }
+
+        new ItemController().updateItem(
+                selectedItem.getId(),
+                title,
+                desc,
+                price
+        );
+
+        showItemsForSelectedUser();
     }
 
     // ----------------- Other tables setup (items & transactions) -----------------
